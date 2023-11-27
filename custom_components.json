@@ -1,0 +1,14 @@
+{
+  "maxcube": {
+    "version": "0.1.0",
+    "local_location": "/custom_components/maxcube/__init__.py",
+    "remote_location": "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/custom_components/maxcube/__init__.py",
+    "visit_repo": "https://raw.githubusercontent.com/JirLap/hass_maxcube/master",
+    "changelog": "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/releases/latest",
+    "resources": [
+      "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/custom_components/maxhomeautomation/binary_sensor.py",
+      "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/custom_components/maxhomeautomation/climate.py",
+      "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/custom_components/maxhomeautomation/sensor.py"
+    ]
+  }
+}
