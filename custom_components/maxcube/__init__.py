@@ -83,6 +83,7 @@ def setup(hass: HomeAssistant, config: ConfigType) -> bool:
 
     load_platform(hass, Platform.CLIMATE, DOMAIN, {}, config)
     load_platform(hass, Platform.BINARY_SENSOR, DOMAIN, {}, config)
+    load_platform(hass, Platform.SENSOR, DOMAIN, {}, config)
 
     return True
 

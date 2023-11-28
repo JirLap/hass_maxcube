@@ -40,7 +40,7 @@ class MaxCubeBinarySensorBase(BinarySensorEntity):
         """Initialize MAX! Cube BinarySensorEntity."""
         self._cubehandle = handler
         self._device = device
-        self._room = handler.cube.room_by_id(device.room_id)
+#        self._attr_room = handler.cube.room_by_id(device.room_id)
 
     def update(self) -> None:
         """Get latest data from MAX! Cube."""
@@ -56,7 +56,7 @@ class MaxCubeShutter(MaxCubeBinarySensorBase):
         """Initialize MAX! Cube BinarySensorEntity."""
         super().__init__(handler, device)
 
-        self._attr_name = f"{self._room.name} {self._device.name}"
+        self._attr_name = f"{self._device.name}"
         self._attr_unique_id = self._device.serial
 
     @property
@@ -74,7 +74,7 @@ class MaxCubeBattery(MaxCubeBinarySensorBase):
         """Initialize MAX! Cube BinarySensorEntity."""
         super().__init__(handler, device)
 
-        self._attr_name = f"{self._room.name} {device.name} battery"
+        self._attr_name = f"{device.name} Battery Low"
         self._attr_unique_id = f"{self._device.serial}_battery"
 
     @property

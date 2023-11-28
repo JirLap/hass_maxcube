@@ -74,9 +74,10 @@ class MaxCubeClimate(ClimateEntity):
     def __init__(self, handler, device):
         """Initialize MAX! Cube ClimateEntity."""
         room = handler.cube.room_by_id(device.room_id)
-        self._attr_name = f"{room.name} {device.name}"
+        self._attr_name = f"{device.name}"
         self._cubehandle = handler
         self._device = device
+#        self._attr_room = room
         self._attr_should_poll = True
         self._attr_unique_id = self._device.serial
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
@@ -125,9 +126,9 @@ class MaxCubeClimate(ClimateEntity):
         """Set new target hvac mode."""
         if hvac_mode == HVACMode.OFF:
             self._set_target(MAX_DEVICE_MODE_MANUAL, OFF_TEMPERATURE)
-        elif hvac_mode == HVACMode.HEAT:
-            temp = max(self._device.target_temperature, self.min_temp)
-            self._set_target(MAX_DEVICE_MODE_MANUAL, temp)
+#        elif hvac_mode == HVACMode.HEAT:
+#            temp = max(self._device.target_temperature, self.min_temp)
+            self._set_target(MAX_DEVICE_MODE_BOOST, None)
         elif hvac_mode == HVACMode.AUTO:
             self._set_target(MAX_DEVICE_MODE_AUTOMATIC, None)
         else:
