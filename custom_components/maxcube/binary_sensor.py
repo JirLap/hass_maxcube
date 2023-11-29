@@ -9,26 +9,42 @@ from homeassistant.const import EntityCategory
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
-
+from homeassistant.config_entries import ConfigEntry
 from . import DATA_KEY
 
-
-def setup_platform(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
     """Iterate through all MAX! Devices and add window shutters."""
-    devices: list[MaxCubeBinarySensorBase] = []
     for handler in hass.data[DATA_KEY].values():
-        for device in handler.cube.devices:
-            devices.append(MaxCubeBattery(handler, device))
-            # Only add Window Shutters
-            if device.is_windowshutter():
-                devices.append(MaxCubeShutter(handler, device))
+        async_add_entities(
+            MaxCubeBattery(handler, device)
+            for device in handler.cube.devices
+        )
+        async_add_entities(
+            MaxCubeShutter(handler, device)
+            for device in handler.cube.devices
+            if device.is_windowshutter()
+        )       
 
-    add_entities(devices)
+# def setup_platform(
+#     hass: HomeAssistant,
+#     config: ConfigType,
+#     add_entities: AddEntitiesCallback,
+#     discovery_info: DiscoveryInfoType | None = None,
+# ) -> None:
+#     """Iterate through all MAX! Devices and add window shutters."""
+#     devices: list[MaxCubeBinarySensorBase] = []
+#     for handler in hass.data[DATA_KEY].values():
+#         for device in handler.cube.devices:
+#             devices.append(MaxCubeBattery(handler, device))
+#             # Only add Window Shutters
+#             if device.is_windowshutter():
+#                 devices.append(MaxCubeShutter(handler, device))
+
+#     add_entities(devices)
 
 
 class MaxCubeBinarySensorBase(BinarySensorEntity):
