@@ -49,10 +49,12 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
     except timeout as ex:
         _LOGGER.error("Unable to connect to Max!Cube gateway: %s", str(ex))
         return False
+    
+    await hass.config_entries.async_forward_entry_setups(config, PLATFORMS)
 
-    load_platform(hass, Platform.CLIMATE, DOMAIN, {}, config)
+#    load_platform(hass, Platform.CLIMATE, DOMAIN, {}, config)
 #    load_platform(hass, Platform.BINARY_SENSOR, DOMAIN, {}, config)
-    load_platform(hass, Platform.SENSOR, DOMAIN, {}, config)
+#    load_platform(hass, Platform.SENSOR, DOMAIN, {}, config)
     return True
 
 # def setup(hass: HomeAssistant, config: ConfigType) -> bool:
@@ -126,6 +128,8 @@ class MaxCubeHandle:
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
    """Unload a config entry."""
    if unload_ok := await hass.config_entries.async_unload_platforms(entry, PLATFORMS):
-       hass.data[DATA_KEY].pop(entry.entry_id)
+       host = entry.data[CONF_HOST]
+       hass.data[DATA_KEY][host].cube.disconnect
+       hass.data[DATA_KEY].pop(host)
 
    return unload_ok

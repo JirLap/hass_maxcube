@@ -10,27 +10,46 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import TEMP_CELSIUS
+from homeassistant.config_entries import ConfigEntry
 
 from . import DATA_KEY
 
 UNIT_OF_MEASUREMENT_VALVE = "%"
 
-def setup_platform(
+async def async_setup_entry(
     hass: HomeAssistant,
-    config: ConfigType,
-    add_entities: AddEntitiesCallback,
-    discovery_info: DiscoveryInfoType | None = None,
+    config_entry: ConfigEntry,
+    async_add_entities: AddEntitiesCallback,
 ) -> None:
-    """Iterate through all MAX! Devices and add window shutters."""
-    devices: list[MaxCubeSensorBase] = []
+    """Iterate through all MAX! Devices and add thermostats."""
     for handler in hass.data[DATA_KEY].values():
-        for device in handler.cube.devices:
-            if device.is_thermostat():
-                devices.append(MaxCubeValveSensor(handler, device))
-            if device.is_wallthermostat():
-                devices.append(MaxCubeTemperature(handler, device))
+        async_add_entities(
+            MaxCubeValveSensor(handler, device)
+            for device in handler.cube.devices
+            if  device.is_thermostat()
+        )   
+        async_add_entities(
+            MaxCubeTemperature(handler, device)
+            for device in handler.cube.devices
+            if  device.is_wallthermostat()
+        )   
 
-    add_entities(devices)
+# def setup_platform(
+#     hass: HomeAssistant,
+#     config: ConfigType,
+#     add_entities: AddEntitiesCallback,
+#     discovery_info: DiscoveryInfoType | None = None,
+# ) -> None:
+#     """Iterate through all MAX! Devices and add window shutters."""
+#     devices: list[MaxCubeSensorBase] = []
+#     for handler in hass.data[DATA_KEY].values():
+#         for device in handler.cube.devices:
+#             if device.is_thermostat():
+#                 devices.append(MaxCubeValveSensor(handler, device))
+#             if device.is_wallthermostat():
+#                 devices.append(MaxCubeTemperature(handler, device))
+
+#     add_entities(devices)
 
 
 class MaxCubeSensorBase(Entity):

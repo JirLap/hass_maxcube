@@ -1,0 +1,28 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "description": "Připojení na MaxCube gateway.",
+        "data": {
+          "host": "IP adresa",
+          "port": "Port (default 62910)",
+          "scan_interval": "Interval skenování"
+        },
+        "data_description": {
+          "host": "The IP address of the MaCube GW unit. The device should have been configured with a static address.",
+          "port": "The port the MaxCube GW unit is listening for read requests on.",
+          "scan_interval": "The interval (in seconds) of refreshing values."
+        }
+      }
+    },
+    "error": {
+      "write": "Error on write request to pump. Verify your `Remote write port` or `Remote address`.",
+      "read": "Error on read request from pump. Verify your `Remote read port` or `Remote address`.",
+      "address": "Invalid remote address specified. Address must be an IP address or a resolvable hostname.",
+      "address_in_use": "The selected listening port is already in use on this system.",
+      "model": "The selected model doesn't seem to support MODBUS40",
+      "unknown": "[%key:common::config_flow::error::unknown%]",
+      "url": "The specified URL is not well formed nor supported"
+    }
+  }
+}
