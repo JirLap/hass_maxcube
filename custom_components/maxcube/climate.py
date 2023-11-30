@@ -28,10 +28,13 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import DeviceInfo
 
 from . import DATA_KEY
 
 _LOGGER = logging.getLogger(__name__)
+
+DOMAIN = "maxcube"
 
 ATTR_VALVE_POSITION = "valve_position"
 PRESET_ON = "on"
@@ -93,6 +96,7 @@ class MaxCubeClimate(ClimateEntity):
 #        self._attr_room = room
         self._attr_should_poll = True
         self._attr_unique_id = self._device.serial
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device.serial)})
         self._attr_temperature_unit = UnitOfTemperature.CELSIUS
         self._attr_preset_modes = [
             PRESET_NONE,

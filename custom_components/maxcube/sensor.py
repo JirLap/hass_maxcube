@@ -11,8 +11,11 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity import Entity
 from homeassistant.const import TEMP_CELSIUS
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import DeviceInfo
 
 from . import DATA_KEY
+
+DOMAIN = "maxcube"
 
 UNIT_OF_MEASUREMENT_VALVE = "%"
 
@@ -61,6 +64,7 @@ class MaxCubeSensorBase(Entity):
         """Initialize MAX! Cube Sensor Entity."""
         self._cubehandle = handler
         self._device = device
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device.serial)})
 #        self._attr_room = handler.cube.room_by_id(device.room_id)
 #        self._state = None
 
@@ -80,6 +84,7 @@ class MaxCubeValveSensor(MaxCubeSensorBase):
         self._unit_of_measurement = UNIT_OF_MEASUREMENT_VALVE
         self._attr_name = f"{self._device.name} Valve"
         self._attr_unique_id = f"{self._device.serial}_valve"
+
 
     @property
     def unit_of_measurement(self):

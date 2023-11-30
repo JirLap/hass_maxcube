@@ -18,6 +18,7 @@ from homeassistant.helpers.discovery import load_platform
 from homeassistant.components import persistent_notification
 from homeassistant.util.dt import now
 from homeassistant.helpers.typing import ConfigType
+from homeassistant.helpers import device_registry as dr
 
 from maxcube.cube import MaxCube
 
@@ -49,7 +50,21 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
     except timeout as ex:
         _LOGGER.error("Unable to connect to Max!Cube gateway: %s", str(ex))
         return False
-    
+
+    reg = dr.async_get(hass)
+
+    for device in cube.devices:
+      if device.is_thermostat() or device.is_wallthermostat() or device.is_windowshutter():
+        _device_info = reg.async_get_or_create(
+          config_entry_id=config.entry_id,
+          identifiers={(DOMAIN, device.serial)},
+          manufacturer="eQ-3 Max",
+          name=f"{device.name}"
+#          suggested_area=cube.room_by_id(device.room_id)
+        )
+#        device.device_info=_device_info
+
+
     await hass.config_entries.async_forward_entry_setups(config, PLATFORMS)
 
 #    load_platform(hass, Platform.CLIMATE, DOMAIN, {}, config)

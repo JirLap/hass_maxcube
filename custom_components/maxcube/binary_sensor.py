@@ -10,7 +10,11 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.helpers.entity import DeviceInfo
+
 from . import DATA_KEY
+
+DOMAIN = "maxcube"
 
 async def async_setup_entry(
     hass: HomeAssistant,
@@ -56,6 +60,7 @@ class MaxCubeBinarySensorBase(BinarySensorEntity):
         """Initialize MAX! Cube BinarySensorEntity."""
         self._cubehandle = handler
         self._device = device
+        self._attr_device_info = DeviceInfo(identifiers={(DOMAIN, device.serial)})
 #        self._attr_room = handler.cube.room_by_id(device.room_id)
 
     def update(self) -> None:
