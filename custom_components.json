@@ -1,6 +1,6 @@
 {
   "maxcube": {
-    "version": "1.1.0",
+    "version": "1.2.0",
     "local_location": "/custom_components/maxcube/__init__.py",
     "remote_location": "https://raw.githubusercontent.com/JirLap/hass_maxcube/master/custom_components/maxcube/__init__.py",
     "visit_repo": "https://raw.githubusercontent.com/JirLap/hass_maxcube/master",

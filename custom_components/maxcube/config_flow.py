@@ -8,7 +8,7 @@ from .const import *
 
 from socket import timeout
 from typing import Any
-from maxcube.cube import MaxCube
+from .maxcube_api.cube import MaxCube
 
 from homeassistant import config_entries
 from homeassistant.core import HomeAssistant

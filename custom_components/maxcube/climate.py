@@ -4,8 +4,10 @@ from __future__ import annotations
 import logging
 import socket
 from typing import Any
+from datetime import datetime
+from homeassistant.util.dt import now
 
-from maxcube.device import (
+from .maxcube_api.device import (
     MAX_DEVICE_MODE_AUTOMATIC,
     MAX_DEVICE_MODE_BOOST,
     MAX_DEVICE_MODE_MANUAL,
@@ -168,6 +170,7 @@ class MaxCubeClimate(ClimateEntity):
                 self._cubehandle.cube.set_temperature_mode(self._device, temp, mode)
             except (socket.timeout, OSError):
                 _LOGGER.error("Setting HVAC mode failed")
+            return self._cubehandle.cube.update()
 
     @property
     def hvac_action(self) -> HVACAction | None:
@@ -191,6 +194,11 @@ class MaxCubeClimate(ClimateEntity):
             return HVACAction.HEATING
 
         return HVACAction.OFF if self.hvac_mode == HVACMode.OFF else HVACAction.IDLE
+
+    @property
+    def get_programmed_temp_at(self, dt: datetime | now ):
+        """Retrieve the programmed temperature at the given instant."""
+        return self._device.get_programmed_temp_at(dt)
 
     @property
     def target_temperature(self):

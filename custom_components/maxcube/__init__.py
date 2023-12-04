@@ -20,7 +20,7 @@ from homeassistant.util.dt import now
 from homeassistant.helpers.typing import ConfigType
 from homeassistant.helpers import device_registry as dr
 
-from maxcube.cube import MaxCube
+from .maxcube_api.cube import MaxCube
 
 _LOGGER = logging.getLogger(__name__)
 DOMAIN = "maxcube"
