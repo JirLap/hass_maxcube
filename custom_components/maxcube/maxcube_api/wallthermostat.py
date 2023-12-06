@@ -1,7 +1,8 @@
 from .device import MODE_NAMES, MaxDevice
 from datetime import datetime
+from .thermostat import MaxThermostat
 
-class MaxWallThermostat(MaxDevice):
+class MaxWallThermostat(MaxThermostat):
     def __init__(self):
         super(MaxWallThermostat, self).__init__()
         self.comfort_temperature = None
@@ -22,12 +23,3 @@ class MaxWallThermostat(MaxDevice):
             f"comfort={self.comfort_temperature}",
             f"range=[{self.min_temperature},{self.max_temperature}]",
         )
-
-    def get_programmed_temp_at(self, dt: datetime):
-        """Retrieve the programmed temperature at the given instant."""
-        weekday = PROG_DAYS[dt.weekday()]
-        time = f"{dt.hour:02}:{dt.minute:02}"
-        for point in self.programme.get(weekday, []):
-            if time < point["until"]:
-                return point["temp"]
-        return None

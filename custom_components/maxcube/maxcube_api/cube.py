@@ -15,10 +15,10 @@ from .device import (
     MAX_WINDOW_SHUTTER,
     MaxDevice,
 )
-from maxcube.room import MaxRoom
-from maxcube.thermostat import MaxThermostat
-from maxcube.wallthermostat import MaxWallThermostat
-from maxcube.windowshutter import MaxWindowShutter
+from .room import MaxRoom
+from .thermostat import MaxThermostat
+from .wallthermostat import MaxWallThermostat
+from .windowshutter import MaxWindowShutter
 
 from .commander import Commander
 
@@ -83,7 +83,7 @@ class MaxCube(MaxDevice):
                 logger.info(" --- " + str(device))
 
     def update(self):
-        self.__parse_responses(self.__commander.update())
+        return self.__parse_responses(self.__commander.update())
 
     def get_devices(self):
         return self.devices
@@ -148,7 +148,8 @@ class MaxCube(MaxDevice):
             device.eco_temperature = data[19] / 2.0
             device.max_temperature = data[20] / 2.0
             device.min_temperature = data[21] / 2.0
-
+            device.programme = get_programme(data[29:])
+            
         if device and device.is_windowshutter():
             # Pure Speculation based on this:
             # Before: [17][12][162][178][4][0][20][15]KEQ0839778
@@ -301,22 +302,27 @@ class MaxCube(MaxDevice):
                 if mode == MAX_DEVICE_MODE_AUTOMATIC
                 else thermostat.target_temperature
             )
-
-        rf_address = thermostat.rf_address
         room = to_hex(thermostat.room_id)
-        target_temperature = int(temperature * 2) + (mode << 6)
+        target_temperature = to_hex(int(temperature * 2) + (mode << 6))
+        target_temperature_auto = thermostat.get_programmed_temp_at(self._now())
+#        byte_cmd = "000440000000" + rf_address + room + to_hex(target_temperature)
+        # send rather to all devices in room, because byte_cmd modification to only device - breaks bug between connected device in room
+        devices = self.devices_by_room(self.room_by_id(thermostat.room_id))
+        _sent_ok = True
+        for device in devices:
+            if thermostat.is_thermostat() or thermostat.is_wallthermostat():
+                rf_address = device.rf_address
+                byte_cmd = "000040000000" + rf_address + room + target_temperature
+                if self.__commander.send_radio_msg(byte_cmd):
+                    device.mode = mode
+                    if temperature > 0:
+                        device.target_temperature = int(temperature * 2) / 2.0
+                    elif mode == MAX_DEVICE_MODE_AUTOMATIC:
+                        device.target_temperature = target_temperature_auto
+                else:
+                    _sent_ok = False
+        return _sent_ok
 
-        byte_cmd = "000440000000" + rf_address + room + to_hex(target_temperature)
-        if self.__commander.send_radio_msg(byte_cmd):
-            thermostat.mode = mode
-            if temperature > 0:
-                thermostat.target_temperature = int(temperature * 2) / 2.0
-            elif mode == MAX_DEVICE_MODE_AUTOMATIC:
-                thermostat.target_temperature = thermostat.get_programmed_temp_at(
-                    self._now()
-                )
-            return True
-        return False
 
     def set_programme(self, thermostat, day, metadata):
         # compare with current programme

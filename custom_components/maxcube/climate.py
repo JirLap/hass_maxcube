@@ -131,7 +131,7 @@ class MaxCubeClimate(ClimateEntity):
     def hvac_mode(self) -> HVACMode:
         """Return current operation mode."""
         mode = self._device.mode
-        if mode in (MAX_DEVICE_MODE_AUTOMATIC, MAX_DEVICE_MODE_BOOST):
+        if mode == MAX_DEVICE_MODE_AUTOMATIC:
             return HVACMode.AUTO
         if (
             mode == MAX_DEVICE_MODE_MANUAL
@@ -145,7 +145,7 @@ class MaxCubeClimate(ClimateEntity):
         """Set new target hvac mode."""
         if hvac_mode == HVACMode.OFF:
             self._set_target(MAX_DEVICE_MODE_MANUAL, OFF_TEMPERATURE)
-#        elif hvac_mode == HVACMode.HEAT:
+        elif hvac_mode == HVACMode.HEAT:
 #            temp = max(self._device.target_temperature, self.min_temp)
             self._set_target(MAX_DEVICE_MODE_BOOST, None)
         elif hvac_mode == HVACMode.AUTO:
@@ -170,7 +170,6 @@ class MaxCubeClimate(ClimateEntity):
                 self._cubehandle.cube.set_temperature_mode(self._device, temp, mode)
             except (socket.timeout, OSError):
                 _LOGGER.error("Setting HVAC mode failed")
-            return self._cubehandle.cube.update()
 
     @property
     def hvac_action(self) -> HVACAction | None:
@@ -198,7 +197,7 @@ class MaxCubeClimate(ClimateEntity):
     @property
     def get_programmed_temp_at(self, dt: datetime | now ):
         """Retrieve the programmed temperature at the given instant."""
-        return self._device.get_programmed_temp_at(dt)
+        return self._device.get_programmed_temp_at(self._device, dt)
 
     @property
     def target_temperature(self):

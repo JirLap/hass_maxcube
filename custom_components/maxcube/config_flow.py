@@ -16,6 +16,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import selector
 from homeassistant.util.dt import now
 from homeassistant.const import CONF_HOST, CONF_PORT, CONF_SCAN_INTERVAL
+from homeassistant.core import callback
 
 DOMAIN = "maxcube"
 DATA_KEY = "maxcube"
@@ -78,6 +79,7 @@ async def validate_user_input(hass: HomeAssistant, data: dict[str, Any]) -> tupl
     }
 
 
+
 class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Nibe Heat Pump."""
 
@@ -100,5 +102,33 @@ class ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="user", data_schema=STEP_CUBEGW_DATA_SCHEMA, errors=errors
         )
+    async def async_step_reauth(self, user_input=None):
+        return await self.async_step_user()
 
-        
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: config_entries.ConfigEntry):
+        """Create the options flow."""
+        return OptionsFlowHandler(config_entry)
+
+# noinspection PyUnusedLocal
+class OptionsFlowHandler(config_entries.OptionsFlow):
+    def __init__(self, entry: config_entries.ConfigEntry):
+        self.entry = entry
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
+        errors = {}
+        if user_input is not None:
+            try:
+                title, data = await validate_user_input(self.hass, user_input)
+            except FieldError as exception:
+                _LOGGER.exception("Validation error")
+                errors[exception.field] = exception.error
+            except Exception:  # pylint: disable=broad-except
+                _LOGGER.exception("Unexpected exception")
+                errors["base"] = "unknown:" + Exception
+            else:
+                return self.async_create_entry(title=title, data=data)        
+        return self.async_show_form(
+            step_id="init", data_schema=STEP_CUBEGW_DATA_SCHEMA, errors=errors
+        )
