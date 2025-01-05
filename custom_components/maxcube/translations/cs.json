@@ -14,6 +14,19 @@
           "scan_interval": "The interval (in seconds) of refreshing values."
         }
       }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "description": "Nastavení MaxCube gateway.",
+        "data": {
+          "scan_interval": "Interval skenování"
+        },
+        "data_description": {
+          "scan_interval": "The interval (in seconds) of refreshing values."
+        }
+      }
     },
     "error": {
       "write": "Error on write request to pump. Verify your `Remote write port` or `Remote address`.",

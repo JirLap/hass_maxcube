@@ -71,7 +71,7 @@ async def validate_user_input(hass: HomeAssistant, data: dict[str, Any]) -> tupl
         _LOGGER.error("Unable to connect to Max!Cube gateway: %s", str(ex))
         raise FieldError("Unable to connect to Max!Cube gateway: %s", CONF_HOST, "address") from ex
 
-    return f"MaxCube at {data[CONF_HOST]}", {
+    return f"MaxCube at {host}:{port}", {
         **data,
         CONF_HOST: host,
         CONF_PORT: port,
@@ -118,17 +118,26 @@ class OptionsFlowHandler(config_entries.OptionsFlow):
 
     async def async_step_init(self, user_input: dict[str, Any] | None = None) -> FlowResult:
         errors = {}
+        data = self.entry.data
+        _host = data[CONF_HOST]
+        _port = data[CONF_PORT]
+        _scan_interval = data[CONF_SCAN_INTERVAL]
         if user_input is not None:
-            try:
-                title, data = await validate_user_input(self.hass, user_input)
-            except FieldError as exception:
-                _LOGGER.exception("Validation error")
-                errors[exception.field] = exception.error
-            except Exception:  # pylint: disable=broad-except
-                _LOGGER.exception("Unexpected exception")
-                errors["base"] = "unknown:" + Exception
-            else:
-                return self.async_create_entry(title=title, data=data)        
+#            _handle = hass.data[DATA_KEY][_host]
+            _scan_interval = user_input[CONF_SCAN_INTERVAL]
+#            _handle.set_scan_interval(_scan_interval)
+#            self.entry.data[CONF_SCAN_INTERVAL] = _scan_interval
+#            _data[CONF_SCAN_INTERVAL] = _scan_interval
+            _data={}
+            _data[CONF_HOST]=_host
+            _data[CONF_PORT]=_port
+            _data[CONF_SCAN_INTERVAL]=_scan_interval
+            return self.async_create_entry(title=f"MaxCube at {_host}:{_port}", data={
+                **_data,
+                CONF_HOST: _host,
+                CONF_PORT: _port,
+                CONF_SCAN_INTERVAL: _scan_interval
+            })     
         return self.async_show_form(
-            step_id="init", data_schema=STEP_CUBEGW_DATA_SCHEMA, errors=errors
+            step_id="init", data_schema=RECONFIG_SCHEMA, errors=errors
         )

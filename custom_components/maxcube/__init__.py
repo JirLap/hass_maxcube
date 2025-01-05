@@ -55,12 +55,19 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
 
     for device in cube.devices:
       if device.is_thermostat() or device.is_wallthermostat() or device.is_windowshutter():
-        _device_info = reg.async_get_or_create(
+        _model=""
+        if device.is_thermostat(): 
+            _model="Termostat"
+        if device.is_wallthermostat(): 
+            _model="Wall-Termostat"
+        if device.is_windowshutter(): 
+            _model="Windows-Shutter"
+        reg.async_get_or_create(
           config_entry_id=config.entry_id,
           identifiers={(DOMAIN, device.serial)},
           manufacturer="eQ-3 Max",
-          name=f"{device.name}"
-#          suggested_area=cube.room_by_id(device.room_id)
+          name=f"{device.name}",
+          model=_model
         )
 #        device.device_info=_device_info
 
@@ -121,6 +128,9 @@ class MaxCubeHandle:
         self.scan_interval = scan_interval
         self.mutex = Lock()
         self._updatets = time.monotonic()
+    
+    def set_scan_interval(self, scan_interval):
+        self.scan_interval = scan_interval
 
     def update(self):
         """Pull the latest data from the MAX! Cube."""

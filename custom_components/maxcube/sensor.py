@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.helpers.entity import Entity
-from homeassistant.const import TEMP_CELSIUS
+from homeassistant.const import ATTR_TEMPERATURE, UnitOfTemperature
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.entity import DeviceInfo
 
@@ -112,9 +112,14 @@ class MaxCubeTemperature(MaxCubeSensorBase):
 
         self._attr_name = f"{self._device.name} Temperature"
         self._attr_unique_id = f"{self._device.serial}_temperature"
-        self._unit_of_measurement = TEMP_CELSIUS
+        self._attr_unit_of_measurement = UnitOfTemperature.CELSIUS
 
     @property
     def state(self):
         """Return the current temperature."""
         return self._device.actual_temperature
+
+    @property
+    def unit_of_measurement(self):
+        """Return the unit of measurement of this entity, if any."""
+        return self._attr_unit_of_measurement

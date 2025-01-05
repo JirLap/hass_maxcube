@@ -29,7 +29,7 @@ PORT_SELECTOR = vol.All(
 SCAN_SELECTOR = vol.All(
     selector.NumberSelector(
         selector.NumberSelectorConfig(
-            min=5, step=1, max=3000, mode=selector.NumberSelectorMode.BOX
+            min=60, step=1, max=3000, mode=selector.NumberSelectorMode.BOX
         )
     ),
     vol.Coerce(int),
@@ -39,29 +39,12 @@ STEP_CUBEGW_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): selector.TextSelector(),
         vol.Required(CONF_PORT, default=62910): PORT_SELECTOR,
-        vol.Required(CONF_SCAN_INTERVAL, default=300): PORT_SELECTOR,
+        vol.Required(CONF_SCAN_INTERVAL, default=300): SCAN_SELECTOR,
     }
 )
 
-
-
-CONFIG_GATEWAY = vol.Schema(
+RECONFIG_SCHEMA = vol.Schema(
     {
-        vol.Required(CONF_HOST): cv.string,
-        vol.Optional(CONF_PORT, default=DEFAULT_PORT): cv.port,
-        vol.Optional(CONF_SCAN_INTERVAL, default=300): cv.time_period,
+        vol.Required(CONF_SCAN_INTERVAL, default=300): SCAN_SELECTOR,
     }
-)
-
-CONFIG_SCHEMA = vol.Schema(
-    {
-        DOMAIN: vol.Schema(
-            {
-                vol.Required(CONF_GATEWAYS, default={}): vol.All(
-                    cv.ensure_list, [CONFIG_GATEWAY]
-                )
-            }
-        )
-    },
-    extra=vol.ALLOW_EXTRA,
 )
